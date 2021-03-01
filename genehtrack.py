@@ -16,6 +16,14 @@ from matplotlib.patches import Patch
 from matplotlib.lines import Line2D
 
 ##################################
+### Plotting variables
+##################################
+legend_colors = {'latest':'#1a9850','mapped':'#fc8d59', 'deprecated':'#d73027'}
+legend_elements = [Line2D([0], [0], marker='o', color='white', label=k,markerfacecolor=v, markersize=15) 
+                   for k,v in legend_colors.items()]
+
+
+##################################
 ### General methods
 ##################################
 
@@ -168,25 +176,67 @@ class GHTracker:
 
     def putative_mappings(self,gene_list):
         G = self.G
-        R = {}
+        rows = []
         for gene in gene_list:
+            u,u_coord,u_version = gene,G.nodes()[gene]['coord'],G.nodes()[gene]['version']
             g1 = dfs_tree(G,gene)        
-            latest = None
-            for x in g1.nodes():
-                a = G.nodes()[x]
-                #print(x,a)
-                if a['status']=='latest':        
-                    if latest is None:
-                        latest=[x]
-                    else:
-                        latest.append(x)        
-            #R[gene] = '' if latest is None else ','.join(latest)
-            R[gene] = set() if latest is None else set(latest)
-        #dfx = pd.DataFrame.from_dict(R,orient='index').reset_index()
-        #dfx.columns = ['query','mappings']
-        #return dfx
+            v,v_coord = None,None
+            for x in g1.nodes():                        
+                if G.nodes()[x]['status']=='latest':
+                    path_info = ';'.join([G.edges[e]['label'] for e in nx.path_graph(nx.shortest_path(G,gene,x)).edges()])                
+                    v,v_coord,v_version = x,G.nodes()[x]['coord'],G.nodes()[x]['version']
+                    rows.append((u,u_coord,u_version,v,v_coord,v_version,path_info))
+            if v is None:
+                rows.append((u,u_coord,u_version,np.nan,np.nan,-1,np.nan))
+        R = pd.DataFrame(rows,columns=['query_id','query_coords','query_version','target_id','target_coords','target_version','path'])
+        R = R[['query_id','target_id','query_coords','target_coords','query_version','target_version','path']]    
         return R
     
+    def plot_gene_subtree(self,gene_shortid,full_tree=False,output_img=None,output_gml=None,figsize=(15,15)):
+        G = self.G
+        GR = self.GR
+        node = gene_shortid
+        g1 = dfs_tree(G,node)
+        g2 = dfs_tree(GR,node)
+        if not full_tree:
+            gs = G.subgraph(set(g1.nodes())|set(g2.nodes()))
+        else:
+            _s = set()
+            for n in g2.nodes():
+                _s |= dfs_tree(G,n).nodes()
+            gs = G.subgraph(_s)
+
+        fig,ax = plt.subplots(figsize=figsize)
+        ax.set_title(node+' ID history')
+        args = '-Grankdir="LR"'
+        #pos = graphviz_layout(gs, prog='dot',args=args)
+        #pos = nx.spring_layout(gs)
+        pos = graphviz_layout(gs, prog='neato')    
+        pos_labels = {k: (v[0],v[1]*1.0) for k,v in pos.items()}
+        nodelist = gs.nodes()
+        edgelist = gs.edges()
+        node_color = [G.nodes[x]['color'] for x in nodelist]
+        node_labels = {x:'%s\nv%d'%(x,G.nodes[x]['version']) for x in nodelist}            
+        edge_labels = {x:nx.get_edge_attributes(G,'label')[x].replace(')(',')\n(') for x in edgelist}
+
+        nx.draw_networkx_nodes(gs, pos, nodelist=[node],node_color='darkgray',node_size = 500)
+        nx.draw_networkx_nodes(gs, pos, nodelist=nodelist,node_color=node_color,node_size = 200)
+        plotted_labels = nx.draw_networkx_labels(gs, pos_labels, labels=node_labels, verticalalignment='top',font_weight='bold')
+        nx.draw_networkx_edges(gs, pos, edgelist=edgelist,edge_color='blue',arrows=True)    
+        nx.draw_networkx_edge_labels(gs,pos,edge_labels=edge_labels,font_color='blue')
+
+        x_values, y_values = zip(*pos.values())
+        x_max = max(x_values)
+        x_min = min(x_values)
+        x_margin = (x_max - x_min) * 0.2
+        plt.xlim(x_min - x_margin, x_max + x_margin)    
+        ax.legend(handles=legend_elements, loc='best',fontsize=12)    
+        if output_img is not None:
+            _ = ax.axis('off')
+            plt.savefig(output_img, bbox_inches='tight')
+        if output_gml is not None:
+            nx.write_gml(gs,output_gml)
+        plt.show()    
     ##################################
     ### Download methods
     ##################################
