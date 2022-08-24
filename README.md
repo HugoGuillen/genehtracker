@@ -1,4 +1,4 @@
-# genehtrack - Gene ID History Tracker
+# genehtracker - Gene ID History Tracker
 
 The main objectives of this project are:
 1. Retrieve latest coordinates for a list of ENSEMBL IDs
@@ -13,8 +13,9 @@ The project is being developed in Python 3. A conda environment could be setup a
 conda config --add channels defaults
 conda config --add channels bioconda
 conda config --add channels conda-forge
+conda install mamba
 
-conda create -n genehtrack -c bioconda -c conda-forge -c anaconda nomkl pandas matplotlib networkx bedtools graphviz pygraphviz python=3.7
+mamba create -n genehtrack python=3 nomkl pandas matplotlib networkx bedtools graphviz pygraphviz 
 ```
 
 ---
