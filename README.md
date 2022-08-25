@@ -15,7 +15,7 @@ conda config --add channels bioconda
 conda config --add channels conda-forge
 conda install mamba
 
-mamba create -n genehtrack python=3 nomkl pandas matplotlib networkx bedtools graphviz pygraphviz 
+mamba create -n genehtracker python=3 nomkl pandas matplotlib networkx bedtools graphviz pygraphviz 
 ```
 
 ---
@@ -29,7 +29,7 @@ mamba create -n genehtrack python=3 nomkl pandas matplotlib networkx bedtools gr
 
 ### Import
 ```python
-from genehtrack import GHTracker
+from genehtracker import GHTracker
 
 GH = GHTracker(index_path='index')
 GH.load_index()
