@@ -13,7 +13,9 @@ The project is being developed in Python 3. A conda environment could be setup a
 conda config --add channels defaults
 conda config --add channels bioconda
 conda config --add channels conda-forge
-conda install mamba
+conda config --set channel_priority strict
+
+conda install mamba -n base -c conda-forge
 
 mamba create -n genehtracker python=3 nomkl pandas matplotlib networkx bedtools graphviz pygraphviz 
 ```
