@@ -22,9 +22,24 @@ mamba create -n genehtracker python=3 nomkl pandas matplotlib networkx bedtools 
 
 ---
 ## TODO:
-- Generate command line script
-- Generate full tutorial
-- Include functions to download complete Gencode and build the index
+### Functionality
+- [ ] Add functions for finding gene ids
+- [ ] Allow figure size parameter
+- [ ] Save figures
+- [ ] Add helper classes
+- [ ] Command line diagrams
+- [ ] Command line tables
+
+### Documentation
+- [ ] Tutorial for object oriented
+- [ ] Tutorial for command line
+- [ ] Poster
+- [ ] Add new dependencies (python-Levenshtein, seaborn, python-graphviz, pydot, ucsc-liftover)
+- [ ] Export environment to yml
+
+### QoL
+- [ ] Log messages while creating index
+- [ ] Prefilter first and last genes to speed up intersection and index creation
 
 ---
 # Showcase
