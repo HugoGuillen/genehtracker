@@ -1,5 +1,9 @@
 # genehtracker - Gene ID History Tracker
 
+![gru](img/gru.jpg)
+
+<font color="red">New:</font> you can find the ECCB2022 poster [here](img/poster_eccb_hugo.pdf).
+
 The main objectives of this project are:
 1. Retrieve latest coordinates for a list of ENSEMBL IDs
 2. Find the complete (GENCODE) annotation history of a gene ID
